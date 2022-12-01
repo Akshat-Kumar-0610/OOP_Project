@@ -82,14 +82,14 @@ public class Books {
 
     public int GetQuantity() {
         dbConnectivity db = new dbConnectivity();
-        int quantity_available = db.getQuantityofBook(this.book_id);
+        int quantity_available = db.getQuantityofBookRemaining(this.book_id);
         return quantity_available;
 
     }
 
-    public boolean ChekcAvailability(int book_id) {
+    public static  boolean ChekcAvailability(int book_id) {
         dbConnectivity db = new dbConnectivity();
-        int quantity_available = db.getQuantityofBook(this.book_id);
+        int quantity_available = db.getQuantityofBookRemaining(book_id);
         if (quantity_available <= 0) {
             return false;
         } else {

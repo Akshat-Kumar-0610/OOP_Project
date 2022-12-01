@@ -186,43 +186,21 @@ public class Loan {
         db.setLoanFineStatus(loanId, status);
     }
 
-    public boolean GetLoan(ArrayList<Books> BooksList, Student Loanee, ArrayList<User> Borrowers, Admin AdminBody, ArrayList<Loan> LoanList) {
-        System.out.print("Search the book here \n Press 1. to search with title \n Press 2. to search by author name \n 3. to search by subject\n ");
-        Scanner input = new Scanner(System.in);
-        boolean status = false;
-        int command = input.nextInt();
-        if (command == 1) {
-            System.out.print("Enter the title ");
-            String Title = input.next();
-            Loanee.SearchBookbyTitle(Title);
-        } else if (command == 2) {
-            System.out.print("Enter the author name ");
-            String A_name = input.next();
-            Loanee.SearchBookbyAuthor(A_name);
-        } else {
-            System.out.print("You pressed invalid key ! Now displaying all the books ");
-            for (Books b : BooksList) {
+    public static boolean loanBook(int bookId, String studentId) {
 
-                b.PrintInformation();
-            }
-        }
-        System.out.print("Now provide the id of book you want ");
-        int id = input.nextInt();
-        boolean is_available = false;
-        for (Books b : BooksList) {
-            if (b.ChekcAvailability(id) == true) {
-                is_available = true;
-                // return status;
-            }
-        }
+        Library lib = new Library();
+        dbConnectivity db = new dbConnectivity();
+        Student s = db.getStudentObjectByUserId(studentId);
+        Books b = db.getBookById(bookId);
 
-        if (is_available == true) {
-            status = AdminBody.checkOutItem(id, Loanee, BooksList, this, LoanList);
-
-        }
+        int index =  lib.getAllLoansList().size();
+        Loan LoanObj = new Loan(index+1);
+        LoanObj.setBook(b);
+        LoanObj.setUser(s);
+        lib.addLoan(LoanObj);
+        boolean status = db.addNewLoan(LoanObj);
 
         return status;
-
     }
 
     public double CalculateFine() {

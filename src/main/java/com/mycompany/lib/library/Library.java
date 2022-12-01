@@ -1,5 +1,6 @@
 package com.mycompany.lib.library;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class Library {
@@ -10,6 +11,8 @@ public class Library {
     public static ArrayList<Admin> adminsList;
     public static ArrayList<Books> booksList;
 
+    public static ArrayList<Loan> allLoansList;
+
     Library() {
 
         dbConnectivity db = new dbConnectivity();
@@ -17,6 +20,7 @@ public class Library {
 
         booksList = db.LoadAllBooks();
         adminsList = db.loadAllAdmin();
+        allLoansList = db.loadLoanList();
 
         for (int i = 0; i < studentsList.size(); i++) {
             Student B = studentsList.get(i);
@@ -75,7 +79,7 @@ public class Library {
 //        for (int i =){
 //    }
 
-    String CheckLoanofUser(String userId) {
+    public String CheckLoanofUser(String userId) {
         String Str = "";
         for (int i = 0; i < studentsList.size(); i++) {
             Student S = studentsList.get(i);
@@ -88,6 +92,13 @@ public class Library {
 
     }
 
+    public ArrayList<Loan> getAllLoansList(){
+        return allLoansList;
+    }
+
+    public static void addLoan(Loan L){
+        allLoansList.add(L);
+    }
 
     ArrayList<Books> AdminSearchBookbyTitle(String title, String adminId) {
         ArrayList<Books> SelectedBooks = new ArrayList<>();

@@ -126,17 +126,19 @@ public class dbConnectivity {
 
     }
 
-    int getQuantityofBook(int bookId) {
-        int quantity = -1;
+    int getQuantityofBookRemaining(int bookId) {
+        int quantityRemaining = -1;
         try {
-            ResultSet rs = stmt.executeQuery("select quantity from book where idBook='" + bookId + "'");
+            ResultSet rs = stmt.executeQuery("select quantity,  quantityIssued from book where idBook='" + bookId + "'");
             while (rs.next()) {
-                quantity = rs.getInt(1);
+                int quantity = rs.getInt(1);
+                int quantityIssued = rs.getInt(2);
+                quantityRemaining = quantity-quantityIssued;
             }
         } catch (Exception e) {
             System.out.println(e);
         }
-        return quantity;
+        return quantityRemaining;
     }
 
     void updateBookQuantity(int newQuantity, int id) {
@@ -382,11 +384,10 @@ public class dbConnectivity {
 
         ArrayList<Loan> LoanList = new ArrayList<>();
         try {
-            ResultSet rs = stmt.executeQuery("SELECT user.userLoginId, user.password, user.name, user.gender, student.fine, student.fineDefaulter,loan.idLoan, loan.issueDate, loan.dueDate, loan.returnDate, loan.fineStatus, loan.returnedStatus, book.idBook, book.author, book.title, book.quantity\n" +
+            ResultSet rs = stmt.executeQuery("SELECT user.userLoginId, user.password, user.name, user.gender,loan.idLoan, loan.issueDate, loan.dueDate, loan.returnDate, loan.fineStatus, loan.returnedStatus, book.idBook, book.author, book.title, book.quantity\n" +
                     "FROM loan\n" +
-                    "INNER JOIN student on loan.idStudent=student.idStudent\n" +
-                    "INNER JOIN book on loan.issuedBookId=book.idBook\n" +
-                    "INNER JOIN user on student.idUser=user.userLoginId;");
+                    "INNER JOIN user on loan.idUser=user.userLoginId\n" +
+                    "INNER JOIN book on loan.issuedBookId=book.idBook");
             while (rs.next()) {
                 String id;
                 String studentName;
@@ -405,21 +406,21 @@ public class dbConnectivity {
                 password = rs.getString(2);
                 studentName = rs.getString(3);
                 studentGender = Gender.genderFromChar(rs.getString(4).charAt(0));
-                fine = rs.getFloat(5);
-                fineDefaulter = rs.getBoolean(6);
-                loanId = rs.getInt(7);
-                issueDate = rs.getDate(8);
-                dueDate = rs.getDate(9);
-                returnedDate = rs.getDate(10);
-                fineStatus = rs.getString(11);
-                returnedStatus = rs.getBoolean(12);
-                bookId = rs.getInt(13);
-                author = rs.getString(14);
-                title = rs.getString(15);
-                quantity = rs.getInt(16);
+//                fine = rs.getFloat(5);
+//                fineDefaulter = rs.getBoolean(6);
+                loanId = rs.getInt(5);
+                issueDate = rs.getDate(6);
+                dueDate = rs.getDate(7);
+                returnedDate = rs.getDate(8);
+                fineStatus = rs.getString(9);
+                returnedStatus = rs.getBoolean(10);
+                bookId = rs.getInt(11);
+                author = rs.getString(12);
+                title = rs.getString(13);
+                quantity = rs.getInt(14);
 
-                Student student = new Student(id,password, studentName, studentGender);
-                Books LoanedBook = new Books(bookId, author, title, quantity);
+                Student student = getStudentObjectByUserId(id);
+                Books LoanedBook = getBookById(bookId);
                 Loan LoanTempObj = new Loan(loanId, student, LoanedBook, fineStatus, returnedStatus, issueDate, dueDate, returnedDate);
                 LoanList.add(LoanTempObj);
 
@@ -437,11 +438,10 @@ public class dbConnectivity {
 
         ArrayList<Loan> LoanListofUser = new ArrayList<>();
         try {
-            ResultSet rs = stmt.executeQuery("SELECT user.userLoginId, user.password, user.name, user.gender, student.fine, student.fineDefaulter,loan.idLoan, loan.issueDate, loan.dueDate, loan.returnDate, loan.fineStatus, loan.returnedStatus, book.idBook, book.author, book.title, book.quantity\n" +
+            ResultSet rs = stmt.executeQuery("SELECT user.userLoginId, user.password, user.name, user.gender,loan.idLoan, loan.issueDate, loan.dueDate, loan.returnDate, loan.fineStatus, loan.returnedStatus, book.idBook, book.author, book.title, book.quantity\n" +
                     "FROM loan\n" +
-                    "INNER JOIN student on loan.idStudent=student.idStudent\n" +
-                    "INNER JOIN book on loan.issuedBookId=book.idBook\n" +
-                    "INNER JOIN user on student.idUser=user.userLoginId;");
+                    "INNER JOIN user on loan.idUser=user.userLoginId\n" +
+                    "INNER JOIN book on loan.issuedBookId=book.idBook");
 
             while (rs.next()) {
                 String id;
@@ -461,21 +461,21 @@ public class dbConnectivity {
                 password = rs.getString(2);
                 studentName = rs.getString(3);
                 studentGender = Gender.genderFromChar(rs.getString(4).charAt(0));
-                fine = rs.getFloat(5);
-                fineDefaulter = rs.getBoolean(6);
-                loanId = rs.getInt(7);
-                issueDate = rs.getDate(8);
-                dueDate = rs.getDate(9);
-                returnedDate = rs.getDate(10);
-                fineStatus = rs.getString(11);
-                returnedStatus = rs.getBoolean(12);
-                bookId = rs.getInt(13);
-                author = rs.getString(14);
-                title = rs.getString(15);
-                quantity = rs.getInt(16);
+//                fine = rs.getFloat(5);
+//                fineDefaulter = rs.getBoolean(6);
+                loanId = rs.getInt(5);
+                issueDate = rs.getDate(6);
+                dueDate = rs.getDate(7);
+                returnedDate = rs.getDate(8);
+                fineStatus = rs.getString(9);
+                returnedStatus = rs.getBoolean(10);
+                bookId = rs.getInt(11);
+                author = rs.getString(12);
+                title = rs.getString(13);
+                quantity = rs.getInt(14);
 
-                Student Loanee = new Student(id,password, studentName, studentGender);
-                Books LoanedBook = new Books(bookId, author, title, quantity);
+                Student Loanee = getStudentObjectByUserId(id);
+                Books LoanedBook = getBookById(bookId);
                 Loan LoanTempObj = new Loan(loanId, Loanee, LoanedBook, fineStatus, returnedStatus, issueDate, dueDate, returnedDate);
                 LoanListofUser.add(LoanTempObj);
 
@@ -523,10 +523,11 @@ public class dbConnectivity {
             java.sql.Date dueDate1 = new java.sql.Date(dueDate.getTime());
             java.sql.Date return_date1 = new java.sql.Date(return_date.getTime());
 
-            stmt.executeUpdate("Insert into loan (idLoan , issueDate ,dueDate ,  returnDate , idStudent, issuedBookId fineStatus , returnedStatus ) values('" + loanid + "','" + issueDate1 + "','" + dueDate1 + "','" + return_date1 + "','" + id + "','" + bookId + "','" + fineStatus + "','" + returnedStatus + "')");
+            stmt.executeUpdate("Insert into loan (idLoan , issueDate ,dueDate ,  returnDate , idUser, issuedBookId, fineStatus , returnedStatus ) values('" + loanid + "','" + issueDate1 + "','" + dueDate1 + "','" + return_date1 + "','" + id + "','" + bookId + "','" + fineStatus + "','" +  (int)(returnedStatus? 1 : 0) + "')");
 
         } catch (Exception e) {
             System.out.println(e);
+            return false;
         }
         return true;
 
