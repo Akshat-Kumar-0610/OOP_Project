@@ -71,26 +71,22 @@ public class Library {
 
     }
 
-
-//    String CheckLoanofUser(String user_id, String adminId) {
-//        String Str = "";
-//        for (int i = 0; i < adminsList.size(); i++) {
-//            Admin C = adminsList.get(i);
-//            if (C.getUserId().equals(adminId)) {
-//
-//                Str = Str + C.viewInformation(U.getLoans(), user_id);
-//                break;
-//
-//            }
-//
-//
-//        }
-//
-//
-//        return Str;
-//
-//
+//    Student getStudentFromId(String Id){
+//        for (int i =){
 //    }
+
+    String CheckLoanofUser(String userId) {
+        String Str = "";
+        for (int i = 0; i < studentsList.size(); i++) {
+            Student S = studentsList.get(i);
+            if (S.getUserId().equals(userId)) {
+                Str+=S.viewLoanInformation();
+            }
+        }
+        return Str;
+
+
+    }
 
 
     ArrayList<Books> AdminSearchBookbyTitle(String title, String adminId) {

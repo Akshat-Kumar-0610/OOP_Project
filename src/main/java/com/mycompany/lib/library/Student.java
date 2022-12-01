@@ -128,4 +128,21 @@ public class Student extends User {
 
     }
 
+    public String viewLoanInformation() {
+        String Resultant = "";
+        if (loans.isEmpty() == false) {
+            for (int i = 0; i < loans.size(); i++) {
+                Loan L = loans.get(i);
+                Resultant += L.PrintLoanInfo();
+                Resultant += "\n";
+            }
+        } else {
+
+            Resultant += "NO LOANS TILL YET!";
+        }
+
+        return Resultant;
+
+    }
+
 }
