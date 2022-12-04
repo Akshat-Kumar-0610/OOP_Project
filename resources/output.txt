@@ -1,3 +1,0 @@
-Student registered with following details: userId: f20200001   Name: Akshat gender: MALE
-    Student registered with following details: userId: f20200002   Name: Mithil gender: MALE
-    Student registered with following details: userId: f20200003   Name: Kunal gender: MALE

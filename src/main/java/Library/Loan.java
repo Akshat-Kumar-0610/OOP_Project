@@ -197,12 +197,15 @@ public class Loan {
         for(int i=0; i < s1.getLoans().size(); i++){
             l = s1.getLoans().get(i);
             if(bookId == l.getBookId() && l.getReturnedStatus() == false){
-                double fine = l.calculateFine();
                 l.setReturnedStatus(true);
                 l.setReturnedDate(returnDate);
+                double fine = l.calculateFine();
+
+
                 s1.setFineAmount(s1.getFineAmount() + fine);
                 s1.removeLoan(l);
-                result = "Book successfully returned.";
+                l.setFineStatus(""+fine);
+                result = "Book successfully returned. Fine: "+ " Total fine:"+s1.getFineAmount();
                 break;
             }
         }
@@ -218,7 +221,7 @@ public class Loan {
             if (bookId == l.getBookId() && l.getReturnedStatus() == false) {
                 returnBook(bookId, studentId, renewDate);
                 issueBook(bookId, studentId);
-                result = "Book successfully renewed.";
+                result = "Book successfully renewed. Total Fine: "+studentObject.getFineAmount();
                 break;
             }
         }
@@ -226,7 +229,6 @@ public class Loan {
     }
 
     public double calculateFine() {
-        if (returnDate!=null) {
             if (returnDate.after(dueDate)) {
                 long difference = (returnDate.getTime() - dueDate.getTime()) / 86400000;
                 difference = Math.abs(difference);
@@ -234,18 +236,15 @@ public class Loan {
             } else {
                 return 0.0;
             }
-        }else {
-            return 0.0;
-        }
     }
 
     public String getLoanInfoAsString() {
         String userId = this.user.getUserId();
         int bookid = issuedBook.getBookId();
         String resultant = " ";
-        resultant = resultant + "loanId:" + loanId + "\t" + "issue date:" + issueDate + "\t" + "due date" + dueDate + "\t"
-                + "returnDate:" + returnDate + "\t" + "borrower id " + userId + "\t" + " issuedBook :"
-                + bookid + "\t" + "fine status  :" + fineStatus + "\t" + "returned status" + returnedStatus + "\n";
+        resultant = resultant + "issueDate: " + issueDate + " " + "dueDate " + dueDate + " "
+                + "returnDate: " + returnDate  + " issuedBook: "
+                + bookid + " "  + "returnedStatus: " + returnedStatus + "\n";
         return resultant;
 
     }

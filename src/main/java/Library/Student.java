@@ -49,7 +49,7 @@ public class Student extends User implements Search{
         if (loans.isEmpty() == false) {
             for (int i = 0; i < loans.size(); i++) {
                 Loan L = loans.get(i);
-                Resultant += L.getLoanInfoAsString();
+                Resultant += L.getLoanInfoAsString()+"\n";
                 Resultant += "\n";
             }
         } else {

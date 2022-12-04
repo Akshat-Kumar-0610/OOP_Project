@@ -230,7 +230,16 @@ public class DBConnection extends Thread{
         return true;
     }
 
-    // check yhid functions
+    boolean setName(User user, String name) {
+        try {
+            stmt.executeUpdate("Update user Set name='" + name + "' Where userLoginId='" + user.getUserId() + "'");
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+        return true;
+    }
+
     boolean setUserId(String id, String newId) {
         try {
             Student stud = Library.getStudentObjectFromUserID(id);
@@ -246,6 +255,16 @@ public class DBConnection extends Thread{
     boolean setGender(String id, char g) {
         try {
             stmt.executeUpdate("Update user Set gender='" + g + "' Where userLoginId='" + id + "'");
+        } catch (Exception e) {
+            System.out.println(e);
+            return false;
+        }
+        return true;
+    }
+
+    boolean setGender(User user, char g) {
+        try {
+            stmt.executeUpdate("Update user Set gender='" + g + "' Where userLoginId='" + user.getUserId() + "'");
         } catch (Exception e) {
             System.out.println(e);
             return false;

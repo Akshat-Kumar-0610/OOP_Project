@@ -296,12 +296,18 @@ public class StudentMenuUI extends javax.swing.JFrame {
             }catch (Exception E){
                 result = false;
             }
+            String loanInfo = Library.getLoansOfUserAsString(id);
+
+            LoanDetails.setText(loanInfo);
         } else if (choice == 4) {
             String PrintingMessage = "Operation failed";
             int bookId = Integer.parseInt(ReturnBookId.getText());
             Calendar calendar = Calendar.getInstance();
             Date returnDate = calendar.getTime();
             PrintingMessage = Loan.returnBook(bookId, id, returnDate);
+            String loanInfo = Library.getLoansOfUserAsString(id);
+
+            LoanDetails.setText(loanInfo);
 
             Result.setText(PrintingMessage);
         } else if (choice == 5 ){
@@ -314,7 +320,9 @@ public class StudentMenuUI extends javax.swing.JFrame {
             } catch (Exception e) {
 
             }
+            String loanInfo = Library.getLoansOfUserAsString(id);
 
+            LoanDetails.setText(loanInfo);
             Result.setText(PrintingMessage);
         }
 

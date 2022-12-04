@@ -80,12 +80,12 @@ public class Library implements SuperUserMethods, Search{
         return false;
     }
 
-    public String getLoansOfUserAsString(String userId) {
+    public static String getLoansOfUserAsString(String userId) {
         String Str = "";
         for (int i = 0; i < studentsList.size(); i++) {
             Student S = studentsList.get(i);
             if (S.getUserId().equals(userId)) {
-                Str+=S.getLoanInformationAsString();
+                Str+=S.getLoanInformationAsString()+'\n';
             }
         }
         return Str;
