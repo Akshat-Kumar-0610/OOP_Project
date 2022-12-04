@@ -5,7 +5,10 @@
  */
 package Library;
 
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class StudentMenuUI extends javax.swing.JFrame {
     String id;
@@ -233,52 +236,30 @@ public class StudentMenuUI extends javax.swing.JFrame {
         }
         if (choice == 1) {
             String title = TitleTextField.getText();
-//            Library L = new Library ();
-//            Borrower B=  L.GetBorrowerbyUserId(id);
-//           ArrayList<Books>B1= B.searchBookbyTitle(title);
             String PrintingMessage = "No Record found";
-            for (int i = 0; i < Library.getStudentsList().size(); i++) {
+            Library lib = new Library();
+            ArrayList<Books> SelectedBooks = lib.searchBookByTitle(title);
 
-                User U = Library.getStudentsList().get(i);
-                if (U.getUserId() == id) {
-
-                    ArrayList<Books> SelectedBooks = U.searchBookByTitle(title);
-
-                    if (SelectedBooks.isEmpty() == false) {
-                        PrintingMessage = " ";
-                        for (int counter = 0; counter < SelectedBooks.size(); counter++) {
-                            Books B = SelectedBooks.get(counter);
-
-                            PrintingMessage = PrintingMessage + "   " + B.getBookId() + "  " + B.getTitle() + "    " + B.getAuthor() + "\n";
-                        }
-
-                        break;
-                    }
+            if (SelectedBooks.isEmpty() == false) {
+                PrintingMessage = " ";
+                for (int counter = 0; counter < SelectedBooks.size(); counter++) {
+                    Books B = SelectedBooks.get(counter);
+                    PrintingMessage = PrintingMessage + "   " + B.getBookId() + "  " + B.getTitle() + "    " + B.getAuthor() + "\n";
                 }
-
             }
             Result.setText(PrintingMessage);
         } else if (choice == 2) {
             String Author = AuthorTextField.getText();
             String PrintingMessage = "No Record found";
-            for (int i = 0; i < Library.getStudentsList().size(); i++) {
+            Library lib = new Library();
+            ArrayList<Books> SelectedBooks = lib.searchBookByAuthor(Author);
+            if (SelectedBooks.isEmpty() == false) {
+                PrintingMessage = " ";
+                for (int counter = 0; counter < SelectedBooks.size(); counter++) {
+                    Books B = SelectedBooks.get(counter);
 
-                User U = Library.getStudentsList().get(i);
-                if (U.getUserId().equals(id)) {
-
-                    ArrayList<Books> SelectedBooks = U.searchBookByAuthor(Author);
-                    if (SelectedBooks.isEmpty() == false) {
-                        PrintingMessage = " ";
-                        for (int counter = 0; counter < SelectedBooks.size(); counter++) {
-                            Books B = SelectedBooks.get(counter);
-
-                            PrintingMessage = PrintingMessage + "   " + B.getBookId() + "  " + B.getTitle() + "    " + B.getAuthor() + "\n";
-                        }
-
-                        break;
-                    }
+                    PrintingMessage = PrintingMessage + "   " + B.getBookId() + "  " + B.getTitle() + "    " + B.getAuthor() + "\n";
                 }
-
             }
             Result.setText(PrintingMessage);
 
@@ -299,9 +280,11 @@ public class StudentMenuUI extends javax.swing.JFrame {
             Thread th = new Thread(){
                 public void run(){
                     try {
-                        Loan.issueBook(bookId, id);
+//                        Loan.issueBook(bookId, id);
+                        Result.setText(Loan.issueBook(bookId, id));
                     } catch (Exception e) {
-                        throw new RuntimeException("Error issueing the book");
+                        Result.setText("Operation failed");
+//                        throw new RuntimeException("Error issueing the book");
                     }
                 }
             };
@@ -313,16 +296,26 @@ public class StudentMenuUI extends javax.swing.JFrame {
             }catch (Exception E){
                 result = false;
             }
+        } else if (choice == 4) {
+            String PrintingMessage = "Operation failed";
+            int bookId = Integer.parseInt(ReturnBookId.getText());
+            Calendar calendar = Calendar.getInstance();
+            Date returnDate = calendar.getTime();
+            PrintingMessage = Loan.returnBook(bookId, id, returnDate);
 
+            Result.setText(PrintingMessage);
+        } else if (choice == 5 ){
+            String PrintingMessage = "Operation failed";
+            int bookId = Integer.parseInt(RenewBookId.getText());
+            Calendar calendar = Calendar.getInstance();
+            Date renewDate = calendar.getTime();
+            try {
+                PrintingMessage = Loan.renewBook(bookId, id, renewDate);
+            } catch (Exception e) {
 
-
-
-            if (result == true){
-                Result.setText("Book Issued Successfully");
-            } else{
-                Result.setText("Operation failed");
             }
 
+            Result.setText(PrintingMessage);
         }
 
 

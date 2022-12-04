@@ -49,8 +49,8 @@ public class Loan {
         this.returnDate = returnDate;
         this.dueDate = dueDate;
         this.fineStatus = fineStatus;
-        this.user = db.getStudentObjectByUserId(studentId);
-        this.issuedBook = db.getBookById(borrowedbook_id);
+        this.user = Library.getStudentObjectFromUserID(studentId);
+        this.issuedBook = Library.getBookObjectFromBookID(borrowedbook_id);
         this.returnedStatus = returnedStatus;
     }
 
@@ -153,33 +153,90 @@ public class Loan {
         db.setLoanFineStatus(loanId, status);
     }
 
-    public synchronized  static boolean issueBook(int bookId, String studentId) throws Exception {
+    public synchronized  static String issueBook(int bookId, String studentId) throws Exception {
+        String result = "Unable to issue Book";
         Library lib = new Library();
         DBConnection db = new DBConnection();
-        Student s = db.getStudentObjectByUserId(studentId);
+        Student s = Library.getStudentObjectFromUserID(studentId);
         Books b = db.getBookById(bookId);
+
+        int countIssued = 0;
+        for(Loan l: s.getLoans()){
+            if (l.getReturnedStatus() == false){
+                countIssued++;
+            }
+        }
+        if (countIssued>= Library.getMaxIssues()){
+            return "You have already issued "+Library.getMaxIssues()+" book and cannot issue more";
+        }
+        for(Loan l: s.getLoans()){
+            if (l.getBookId() == bookId && l.getReturnedStatus() == false){
+                return "You have already issued the book with bookID "+bookId;
+            }
+        }
 
         int index =  lib.getAllLoansList().size();
         Loan LoanObj = new Loan(index+1);
         LoanObj.setBook(b);
         LoanObj.setUser(s);
         lib.addLoan(LoanObj);
+        s.addLoan(LoanObj);
         boolean status = db.addNewLoan(LoanObj);
         if(!status){
             throw new Exception("Some error occured while issueing the book.");
         }
-        return status;
+        result = "Book with bookId "+bookId+" issued successfully";
+        return result;
+    }
+
+    public static String returnBook(int bookId,String studentId, Date returnDate) {
+        DBConnection db  = new DBConnection();
+        Student s1 = Library.getStudentObjectFromUserID(studentId);
+        String result = "You have not issued this book.";
+        Loan l = new Loan();
+        for(int i=0; i < s1.getLoans().size(); i++){
+            l = s1.getLoans().get(i);
+            if(bookId == l.getBookId() && l.getReturnedStatus() == false){
+                double fine = l.calculateFine();
+                l.setReturnedStatus(true);
+                l.setReturnedDate(returnDate);
+                s1.setFineAmount(s1.getFineAmount() + fine);
+                s1.removeLoan(l);
+                result = "Book successfully returned.";
+                break;
+            }
+        }
+        s1.getLoans().remove(l);
+        return result;
+    }
+
+    public static String renewBook(int bookId, String studentId, Date renewDate) throws Exception {
+        String result = "You have not issued this book";
+        DBConnection db = new DBConnection();
+        Student studentObject = Library.getStudentObjectFromUserID(studentId);
+        for(Loan l : studentObject.getLoans()) {
+            if (bookId == l.getBookId() && l.getReturnedStatus() == false) {
+                returnBook(bookId, studentId, renewDate);
+                issueBook(bookId, studentId);
+                result = "Book successfully renewed.";
+                break;
+            }
+        }
+        return result;
     }
 
     public double calculateFine() {
-        if (returnDate.after(dueDate)) {
-            long difference = (returnDate.getTime() - dueDate.getTime()) / 86400000;
-            difference = Math.abs(difference);
-            return Library.getFinePerDayPerBook() * difference;
-        } else {
+        if (returnDate!=null) {
+            if (returnDate.after(dueDate)) {
+                long difference = (returnDate.getTime() - dueDate.getTime()) / 86400000;
+                difference = Math.abs(difference);
+                return Library.getFinePerDayPerBook() * difference;
+            } else {
+                return 0.0;
+            }
+        }else {
             return 0.0;
         }
-
     }
 
     public String getLoanInfoAsString() {

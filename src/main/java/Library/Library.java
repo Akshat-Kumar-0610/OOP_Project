@@ -91,6 +91,22 @@ public class Library implements SuperUserMethods, Search{
         return Str;
     }
 
+    public static Student getStudentObjectFromUserID(String userId){
+        for(Student s: studentsList){
+            if(s.getUserId().equals(userId)){
+                return s;
+            }
+        }return null;
+    }
+
+    public static Books getBookObjectFromBookID(int bookId){
+        for(Books b: booksList){
+            if(b.getBookId() == bookId){
+                return b;
+            }
+        }return null;
+    }
+
     public static void addLoan(Loan L){
         allLoansList.add(L);
     }
@@ -119,9 +135,17 @@ public class Library implements SuperUserMethods, Search{
         return authenticated;
     }
 
-    boolean register(String borrower_name, char gender, String userId, String password) {
+    static boolean register(String studentName, char gender, String userId, String password) {
         boolean result = false;
-        result = Admin.addStudent(studentsList, borrower_name, Gender.genderFromChar(gender), userId, password);
+        result = Admin.addStudent(studentsList, studentName, Gender.genderFromChar(gender), userId, password);
+
+        return result;
+
+    }
+
+    static boolean register(String studentName, String userId) {
+        boolean result = false;
+        result = Admin.addStudent(studentsList, studentName, Gender.genderFromChar('m'), userId, userId);
 
         return result;
 

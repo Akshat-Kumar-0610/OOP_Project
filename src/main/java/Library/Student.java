@@ -92,4 +92,12 @@ public class Student extends User implements Search{
         DBConnection db = new DBConnection();
         this.loans = db.loadLoanListofSpecificUser(this.getUserId());
     }
+
+    public void addLoan(Loan L){
+        loans.add(L);
+    }
+
+    public boolean removeLoan(Loan L){
+        return loans.remove(L);
+    }
 }

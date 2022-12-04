@@ -230,9 +230,10 @@ public class DBConnection extends Thread{
         return true;
     }
 
+    // check yhid functions
     boolean setUserId(String id, String newId) {
         try {
-            Student stud = getStudentObjectByUserId(id);
+            Student stud = Library.getStudentObjectFromUserID(id);
             stmt.executeUpdate("DELETE FROM user WHERE userLoginId='" + id + "'");
             addStudent(newId, stud.getPassword(), stud.getName(), stud.getGender());
         } catch (Exception e) {
@@ -291,8 +292,8 @@ public class DBConnection extends Thread{
         ArrayList<Admin> admins = new ArrayList<>();
         try {
             ResultSet rs = stmt.executeQuery("SELECT user.userLoginId, user.password, user.name, user.gender \n" +
-                    "FROM library.admin ad\n" +
-                    "INNER JOIN user on ad.idUser=user.userLoginId;");
+                    "FROM library.admin\n" +
+                    "INNER JOIN user on admin.idUser=user.userLoginId;");
             while (rs.next()) {
                 String id;
                 String password;
@@ -371,8 +372,8 @@ public class DBConnection extends Thread{
                 title = rs.getString(13);
                 quantity = rs.getInt(14);
 
-                Student student = getStudentObjectByUserId(id);
-                Books LoanedBook = getBookById(bookId);
+                Student student = Library.getStudentObjectFromUserID(id);
+                Books LoanedBook = Library.getBookObjectFromBookID(bookId);
                 Loan LoanTempObj = new Loan(loanId, student, LoanedBook, fineStatus, returnedStatus, issueDate, dueDate, returnedDate);
                 LoanList.add(LoanTempObj);
             }
@@ -388,7 +389,8 @@ public class DBConnection extends Thread{
             ResultSet rs = stmt.executeQuery("SELECT user.userLoginId, user.password, user.name, user.gender,loan.idLoan, loan.issueDate, loan.dueDate, loan.returnDate, loan.fineStatus, loan.returnedStatus, book.idBook, book.author, book.title, book.quantity\n" +
                     "FROM loan\n" +
                     "INNER JOIN user on loan.idUser=user.userLoginId\n" +
-                    "INNER JOIN book on loan.issuedBookId=book.idBook");
+                    "INNER JOIN book on loan.issuedBookId=book.idBook\n" +
+                    "WHERE idUser='" + userId + "'");
             while (rs.next()) {
                 String id;
                 String password;
@@ -418,8 +420,8 @@ public class DBConnection extends Thread{
                 author = rs.getString(12);
                 title = rs.getString(13);
                 quantity = rs.getInt(14);
-                Student Loanee = getStudentObjectByUserId(id);
-                Books LoanedBook = getBookById(bookId);
+                Student Loanee = Library.getStudentObjectFromUserID(id);
+                Books LoanedBook = Library.getBookObjectFromBookID(bookId);
                 Loan LoanTempObj = new Loan(loanId, Loanee, LoanedBook, fineStatus, returnedStatus, issueDate, dueDate, returnedDate);
                 LoanListofUser.add(LoanTempObj);
             }
@@ -441,8 +443,8 @@ public class DBConnection extends Thread{
             int bookId = LoanObj.getBookId();
             java.sql.Date issueDate1 = new java.sql.Date(issueDate.getTime());
             java.sql.Date dueDate1 = new java.sql.Date(dueDate.getTime());
-            java.sql.Date return_date1 = new java.sql.Date(return_date.getTime());
-            stmt.executeUpdate("Insert into loan (idLoan , issueDate ,dueDate ,  returnDate , idUser, issuedBookId, fineStatus , returnedStatus ) values('" + loanid + "','" + issueDate1 + "','" + dueDate1 + "','" + return_date1 + "','" + id + "','" + bookId + "','" + fineStatus + "','" +  (int)(returnedStatus? 1 : 0) + "')");
+//            java.sql.Date return_date1 = new java.sql.Date(return_date.getTime());
+            stmt.executeUpdate("Insert into loan (idLoan , issueDate ,dueDate , idUser, issuedBookId, fineStatus , returnedStatus ) values('" + loanid + "','" + issueDate1 + "','" + dueDate1  + "','" + id + "','" + bookId + "','" + fineStatus + "','" +  (int)(returnedStatus? 1 : 0) + "')");
         } catch (Exception e) {
             System.out.println(e);
             return false;
@@ -481,7 +483,7 @@ public class DBConnection extends Thread{
     void setReturnStatus(int loanId, boolean status) {
         int i = 0;
         try {
-            i = stmt.executeUpdate("UPDATE loan SET returnedStatus='" + status + "'Where idLoan='" + loanId + "'");
+            i = stmt.executeUpdate("UPDATE loan SET returnedStatus='" + (int)(status? 1 : 0) + "'Where idLoan='" + loanId + "'");
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -547,7 +549,7 @@ public class DBConnection extends Thread{
             ResultSet rs = stmt.executeQuery("select idBook from book where title='" + input + "'");
             while (rs.next()) {
                 int bookId = rs.getInt(1);
-                Books NewBook = getBookById(bookId);
+                Books NewBook = Library.getBookObjectFromBookID(bookId);
                 BooksList.add(NewBook);
             }
         } catch (Exception e) {
